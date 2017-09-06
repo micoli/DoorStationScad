@@ -1,10 +1,11 @@
 //scale([.1,.1,.1])
 include <raspberrypi3.scad>;
 include <cubex.scad>;
-
+// 1.5/0.7 camera
+// 0.5 led 
 echo(version=version());
 
-$fn=60;
+$fn=20;
 Box(10,20,4,false,50);
 	
 module Lcd(){
@@ -55,7 +56,7 @@ module hygiaphone(){
 	$fn=20;
 	radiusStep=0.3;
 	stepSegments=[0,60,40,20,15,15];
-	for (j = [1:6])
+	for (j = [0:5])
 	{
 		for (i = [0:stepSegments[j]:360])
 		{
@@ -84,6 +85,19 @@ module button(radius,label,font,angle=0,size=0.8){
 			text(label,font = font,size=size, halign="center",valign="center");
 		}
 	}
+}
+module buttonCyl(buttonCylRadius,radius){
+	hull(){
+		translate([0,0,1.3])
+		scale([1,1,0.2])
+		sphere(radius);
+		cylinder(1.1,buttonCylRadius,buttonCylRadius);
+	}
+}
+
+module buttonCylHole(buttonCylRadius,radius){
+	translate([0,0,-1])
+	cylinder(3,radius+0.01,radius+0.01);
 }
 
 module Box(w,l,h,print=false,$fn=40) {
@@ -117,25 +131,22 @@ module Box(w,l,h,print=false,$fn=40) {
 			/*camera*/
 			translate([centerCamera[0],centerCamera[1],1])
 			sphere(1.5,true);
-			
-			translate([buttonCenter[0][0],buttonCenter[0][1],1])
-			cylinder(1.1,buttonCylRadius,buttonCylRadius);
-		
-			translate([buttonCenter[1][0],buttonCenter[1][1],1])
-			cylinder(1.1,buttonCylRadius,buttonCylRadius);
-		
-			translate([buttonCenter[2][0],buttonCenter[2][1],1])
-			cylinder(1.1,buttonCylRadius,buttonCylRadius);
+
+			for(k = [0:2]){
+				translate([buttonCenter[k][0],buttonCenter[k][1],0.8])
+				buttonCyl(buttonCylRadius,buttonRadius);
+			}
+
 		}
+		
 		color("grey")
 		union(){
-			translate([buttonCenter[0][0],buttonCenter[0][1],1])
-			cylinder(1.3,buttonRadius+0.01,buttonRadius+0.01);
-			translate([buttonCenter[1][0],buttonCenter[1][1],1])
-			cylinder(1.3,buttonRadius+0.01,buttonRadius+0.01);
-			translate([buttonCenter[2][0],buttonCenter[2][1],1])
-			cylinder(1.3,buttonRadius+0.01,buttonRadius+0.01);
-
+			for(k = [0:2]){
+				translate([buttonCenter[k][0],buttonCenter[k][1],0.8])
+				buttonCylHole(buttonCylRadius,buttonRadius);
+			}
+		
+		
 			/* defonce box */
 			translate([0,0,-1.1])
 			cubeX([w-0.4,l-0.4,h+2],0.3,true,true);
